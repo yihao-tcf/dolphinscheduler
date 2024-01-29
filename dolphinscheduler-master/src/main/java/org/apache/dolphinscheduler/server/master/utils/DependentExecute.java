@@ -112,13 +112,14 @@ public class DependentExecute {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
                     dateInterval);
             if (processInstance == null) {
-                return DependResult.WAITING;
-            }
-            // need to check workflow for updates, so get all task and check the task state
-            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                result = dependResultByProcessInstance(processInstance);
+                result = DependResult.WAITING;
             } else {
+            // need to check workflow for updates, so get all task and check the task state
+              if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                result = dependResultByProcessInstance(processInstance);
+              } else {
                 result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance);
+              }
             }
             if (result != DependResult.SUCCESS) {
                 break;
