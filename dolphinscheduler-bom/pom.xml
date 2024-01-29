@@ -94,6 +94,7 @@
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.31</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
+        <trino-jdbc.version>422</trino-jdbc.version>
     </properties>
 
     <dependencyManagement>
@@ -766,6 +767,12 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.trino</groupId>
+                <artifactId>trino-jdbc</artifactId>
+                <version>${trino-jdbc.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

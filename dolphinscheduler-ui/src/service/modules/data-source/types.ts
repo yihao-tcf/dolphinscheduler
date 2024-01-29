@@ -27,6 +27,7 @@ type IDataBase =
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
+  | 'TRINO'
 
 interface IDataSource {
   id?: number

@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * Jdbc Data Source Provider
  */
@@ -57,8 +59,13 @@ public class JDBCDataSourceProvider {
 
         dataSource.setMinimumIdle(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
         dataSource.setMaximumPoolSize(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
-        dataSource.setConnectionTestQuery(properties.getValidationQuery());
+        dataSource.setConnectionTimeout(PropertyUtils.getLong(DataSourceConstants.SPRING_DATASOURCE_CONNECTION_TIMEOUT, SECONDS.toMillis(60)));
+        dataSource.setValidationTimeout(PropertyUtils.getLong(DataSourceConstants.SPRING_DATASOURCE_VALIDATION_TIMEOUT, SECONDS.toMillis(30)));
+        dataSource.setIdleTimeout(PropertyUtils.getLong(DataSourceConstants.SPRING_DATASOURCE_IDLE_TIMEOUT, SECONDS.toMillis(60)));
+        dataSource.setMaxLifetime(PropertyUtils.getLong(DataSourceConstants.SPRING_DATASOURCE_MAX_LIFETIME, SECONDS.toMillis(180)));
 
+        dataSource.setConnectionTestQuery(properties.getValidationQuery());
+        dataSource.setKeepaliveTime(PropertyUtils.getLong(DataSourceConstants.SPRING_DATASOURCE_KEEP_ALIVE_TIME, SECONDS.toMillis(30)));
         if (properties.getProps() != null) {
             properties.getProps().forEach(dataSource::addDataSourceProperty);
         }

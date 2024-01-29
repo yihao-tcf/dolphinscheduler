@@ -35,6 +35,7 @@ public class DataSourceConstants {
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
     public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
     public static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
+    public static final String IO_TRINO_JDBC_DRIVER= "io.trino.jdbc.TrinoDriver";
 
     /**
      * validation Query
@@ -49,6 +50,7 @@ public class DataSourceConstants {
     public static final String PRESTO_VALIDATION_QUERY = "select 1";
     public static final String REDHIFT_VALIDATION_QUERY = "select 1";
     public static final String ATHENA_VALIDATION_QUERY = "select 1";
+    public static final String TRINO_VALIDATION_QUERY = "select 1";
 
     /**
      * jdbc url
@@ -64,6 +66,7 @@ public class DataSourceConstants {
     public static final String JDBC_PRESTO = "jdbc:presto://";
     public static final String JDBC_REDSHIFT = "jdbc:redshift://";
     public static final String JDBC_ATHENA = "jdbc:awsathena://";
+    public static final String JDBC_TRINO = "jdbc:trino://";
 
     /**
      * database type
@@ -92,4 +95,14 @@ public class DataSourceConstants {
     public static final String SPRING_DATASOURCE_MAX_ACTIVE = "spring.datasource.maxActive";
 
     public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
+
+    public static final String SPRING_DATASOURCE_CONNECTION_TIMEOUT = "spring.datasource.connectionTimeout";
+
+    public static final String SPRING_DATASOURCE_VALIDATION_TIMEOUT = "spring.datasource.validationTimeout";
+
+    public static final String SPRING_DATASOURCE_IDLE_TIMEOUT= "spring.datasource.idleTimeout";
+
+    public static final String SPRING_DATASOURCE_MAX_LIFETIME= "spring.datasource.maxLifetime";
+
+    public static final String SPRING_DATASOURCE_KEEP_ALIVE_TIME= "spring.datasource.keepaliveTime";
 }
