@@ -121,9 +121,6 @@ public class DependentExecute {
                 result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance);
               }
             }
-            if (result != DependResult.SUCCESS) {
-                break;
-            }
         }
         return result;
     }
