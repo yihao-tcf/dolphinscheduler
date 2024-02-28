@@ -95,6 +95,7 @@
         <snakeyaml.version>1.31</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <trino-jdbc.version>422</trino-jdbc.version>
+        <kyuubi.version>1.8.1</kyuubi.version>
     </properties>
 
     <dependencyManagement>
@@ -773,6 +774,12 @@
                 <groupId>io.trino</groupId>
                 <artifactId>trino-jdbc</artifactId>
                 <version>${trino-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.kyuubi</groupId>
+                <artifactId>kyuubi-hive-jdbc-shaded</artifactId>
+                <version>${kyuubi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

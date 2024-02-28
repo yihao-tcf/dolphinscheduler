@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino.param;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 

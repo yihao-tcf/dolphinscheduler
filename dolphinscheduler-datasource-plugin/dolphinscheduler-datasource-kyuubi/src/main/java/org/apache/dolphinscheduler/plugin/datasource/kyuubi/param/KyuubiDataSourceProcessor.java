@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino.param;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
@@ -39,92 +39,91 @@ import java.util.*;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
-public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
+public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
-        return JSONUtils.parseObject(paramJson, TrinoDataSourceParamDTO.class);
+        return JSONUtils.parseObject(paramJson, KyuubiDataSourceParamDTO.class);
     }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        TrinoConnectionParam connectionParams = (TrinoConnectionParam) createConnectionParams(connectionJson);
+        KyuubiConnectionParam connectionParams = (KyuubiConnectionParam) createConnectionParams(connectionJson);
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
-       TrinoDataSourceParamDTO trinoDatasourceParamDTO = new TrinoDataSourceParamDTO();
-        trinoDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        trinoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        trinoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        trinoDatasourceParamDTO.setUserName(connectionParams.getUser());
-        trinoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+       KyuubiDataSourceParamDTO kyuubiDatasourceParamDTO = new KyuubiDataSourceParamDTO();
+        kyuubiDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        kyuubiDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        kyuubiDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
+        kyuubiDatasourceParamDTO.setUserName(connectionParams.getUser());
+        kyuubiDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
 
-        return trinoDatasourceParamDTO;
+        return kyuubiDatasourceParamDTO;
     }
 
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
-        TrinoDataSourceParamDTO trinoParam = (TrinoDataSourceParamDTO) datasourceParam;
+        KyuubiDataSourceParamDTO kyuubiParam = (KyuubiDataSourceParamDTO) datasourceParam;
         String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_TRINO, trinoParam.getHost(), trinoParam.getPort());
-        String jdbcUrl = address + "/" + trinoParam.getDatabase();
+                String.format("%s%s:%s", DataSourceConstants.JDBC_KYUUBI, kyuubiParam.getHost(), kyuubiParam.getPort());
+        String jdbcUrl = address + "/" + kyuubiParam.getDatabase();
 
-        TrinoConnectionParam trinoConnectionParam = new TrinoConnectionParam();
-        trinoConnectionParam.setUser(trinoParam.getUserName());
-        trinoConnectionParam.setPassword(PasswordUtils.encodePassword(trinoParam.getPassword()));
-        trinoConnectionParam.setOther(transformOther(trinoParam.getOther()));
-        trinoConnectionParam.setAddress(address);
-        trinoConnectionParam.setJdbcUrl(jdbcUrl);
-        trinoConnectionParam.setDatabase(trinoParam.getDatabase());
-        trinoConnectionParam.setDriverClassName(getDatasourceDriver());
-        trinoConnectionParam.setValidationQuery(getValidationQuery());
-        trinoConnectionParam.setProps(trinoParam.getOther());
+        KyuubiConnectionParam kyuubiConnectionParam = new KyuubiConnectionParam();
+        kyuubiConnectionParam.setUser(kyuubiParam.getUserName());
+        kyuubiConnectionParam.setPassword(PasswordUtils.encodePassword(kyuubiParam.getPassword()));
+        kyuubiConnectionParam.setOther(transformOther(kyuubiParam.getOther()));
+        kyuubiConnectionParam.setAddress(address);
+        kyuubiConnectionParam.setJdbcUrl(jdbcUrl);
+        kyuubiConnectionParam.setDatabase(kyuubiParam.getDatabase());
+        kyuubiConnectionParam.setDriverClassName(getDatasourceDriver());
+        kyuubiConnectionParam.setValidationQuery(getValidationQuery());
+        kyuubiConnectionParam.setProps(kyuubiParam.getOther());
 
-        return trinoConnectionParam;
+        return kyuubiConnectionParam;
     }
 
     @Override
     public ConnectionParam createConnectionParams(String connectionJson) {
-        return JSONUtils.parseObject(connectionJson, TrinoConnectionParam.class);
+        return JSONUtils.parseObject(connectionJson, KyuubiConnectionParam.class);
     }
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.IO_TRINO_JDBC_DRIVER;
+        return DataSourceConstants.ORG_APACHE_KYUUBI_JDBC_HIVE_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.TRINO_VALIDATION_QUERY;
+        return DataSourceConstants.KYUUBI_VALIDATION_QUERY;
     }
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        TrinoConnectionParam trinoConnectionParam = (TrinoConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(trinoConnectionParam.getOther())) {
-            return String.format("%s?%s", trinoConnectionParam.getJdbcUrl(), trinoConnectionParam.getOther());
+        KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
+        if (!StringUtils.isEmpty(kyuubiConnectionParam.getOther())) {
+            return String.format("%s?%s", kyuubiConnectionParam.getJdbcUrl(), kyuubiConnectionParam.getOther());
         }
-        return trinoConnectionParam.getJdbcUrl();
+        return kyuubiConnectionParam.getJdbcUrl();
     }
 
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
-        TrinoConnectionParam trinoConnectionParam = (TrinoConnectionParam) connectionParam;
-        TimeZone.setDefault(TimeZone.getTimeZone("+08:00"));
+        KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                trinoConnectionParam.getUser(), PasswordUtils.decodePassword(trinoConnectionParam.getPassword()));
+                kyuubiConnectionParam.getUser(), PasswordUtils.decodePassword(kyuubiConnectionParam.getPassword()));
     }
 
     @Override
     public DbType getDbType() {
-        return DbType.TRINO;
+        return DbType.KYUUBI;
     }
 
     @Override
     public DataSourceProcessor create() {
-        return new TrinoDataSourceProcessor();
+        return new KyuubiDataSourceProcessor();
     }
 
     private String transformOther(Map<String, String> otherMap) {

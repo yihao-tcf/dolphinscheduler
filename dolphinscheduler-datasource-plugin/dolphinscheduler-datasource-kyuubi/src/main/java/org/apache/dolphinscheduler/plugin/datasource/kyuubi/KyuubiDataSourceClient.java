@@ -15,20 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.TimeZone;
+public class KyuubiDataSourceClient extends CommonDataSourceClient {
+    private static final Logger logger = LoggerFactory.getLogger(KyuubiDataSourceClient.class);
 
-public class TrinoDataSourceChannel implements DataSourceChannel {
-
-    @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        TimeZone.setDefault(TimeZone.getTimeZone("+08:00"));
-        return new TrinoDataSourceClient(baseConnectionParam, dbType);
+    public KyuubiDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
+
+
 }

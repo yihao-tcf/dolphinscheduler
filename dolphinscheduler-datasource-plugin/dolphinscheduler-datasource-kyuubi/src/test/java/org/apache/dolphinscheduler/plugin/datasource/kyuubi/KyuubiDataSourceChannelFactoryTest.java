@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 
-public class TrinoDataSourceClient extends CommonDataSourceClient {
-    private static final Logger logger = LoggerFactory.getLogger(TrinoDataSourceClient.class);
+import org.junit.Assert;
+import org.junit.Test;
 
-    public TrinoDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
+public class KyuubiDataSourceChannelFactoryTest {
+
+    @Test
+    public void testCreate() {
+        KyuubiDataSourceChannelFactory sourceChannelFactory = new KyuubiDataSourceChannelFactory();
+        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
+        Assert.assertNotNull(dataSourceChannel);
     }
-
-
 }

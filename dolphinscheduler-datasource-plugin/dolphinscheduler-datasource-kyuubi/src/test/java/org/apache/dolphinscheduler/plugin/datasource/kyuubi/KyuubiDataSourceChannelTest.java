@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
 
-import org.apache.dolphinscheduler.plugin.datasource.trino.param.TrinoConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.kyuubi.param.KyuubiConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.Assert;
@@ -32,14 +32,14 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({TrinoDataSourceClient.class, TrinoDataSourceChannel.class})
-public class TrinoDataSourceChannelTest {
+@PrepareForTest({KyuubiDataSourceClient.class, KyuubiDataSourceChannel.class})
+public class KyuubiDataSourceChannelTest {
     
     @Test
     public void testCreateDataSourceClient() {
-        TrinoDataSourceChannel sourceChannel = PowerMockito.mock(TrinoDataSourceChannel.class);
-        TrinoDataSourceClient dataSourceClient = PowerMockito.mock(TrinoDataSourceClient.class);
+        KyuubiDataSourceChannel sourceChannel = PowerMockito.mock(KyuubiDataSourceChannel.class);
+        KyuubiDataSourceClient dataSourceClient = PowerMockito.mock(KyuubiDataSourceClient.class);
         PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new TrinoConnectionParam(), DbType.TRINO));
+        Assert.assertNotNull(sourceChannel.createDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI));
     }
 }

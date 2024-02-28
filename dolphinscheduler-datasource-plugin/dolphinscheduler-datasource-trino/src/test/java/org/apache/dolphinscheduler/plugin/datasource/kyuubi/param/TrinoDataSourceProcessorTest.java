@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino.param;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -49,29 +49,29 @@ public class TrinoDataSourceProcessorTest {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
         TrinoDataSourceParamDTO trinoDatasourceParamDTO = new TrinoDataSourceParamDTO();
-        trinoDatasourceParamDTO.setHost("10.80.20.136");
+        trinoDatasourceParamDTO.setHost("localhost");
         trinoDatasourceParamDTO.setPort(30001);
         trinoDatasourceParamDTO.setDatabase("system");
-        trinoDatasourceParamDTO.setUserName("obeiadmin");
+        trinoDatasourceParamDTO.setUserName("root");
         trinoDatasourceParamDTO.setPassword(null);
         trinoDatasourceParamDTO.setOther(props);
         PowerMockito.mockStatic(PasswordUtils.class);
         PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
         TrinoConnectionParam connectionParams = (TrinoConnectionParam) trinoDatasourceProcessor
                 .createConnectionParams(trinoDatasourceParamDTO);
-        Assert.assertEquals("jdbc:trino://10.80.20.136:30001", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:trino://10.80.20.136:30001/system", connectionParams.getJdbcUrl());
+        Assert.assertEquals("jdbc:trino://localhost:30001", connectionParams.getAddress());
+        Assert.assertEquals("jdbc:trino://localhost:30001/system", connectionParams.getJdbcUrl());
     }
 
     @Test
     public void testCreateConnectionParams2() {
         String connectionJson =
-                "{\"user\":\"obeiadmin\",\"password\":\"\",\"address\":\"10.80.20.136\""
-                        + ",\"database\":\"system\",\"jdbcUrl\":\"jdbc:trino://10.80.20.136:30001/system\"}";
+                "{\"user\":\"root\",\"password\":\"\",\"address\":\"localhost\""
+                        + ",\"database\":\"system\",\"jdbcUrl\":\"jdbc:trino://localhost:30001/system\"}";
         TrinoConnectionParam connectionParams = (TrinoConnectionParam) trinoDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("obeiadmin", connectionParams.getUser());
+        Assert.assertEquals("root", connectionParams.getUser());
     }
 
     @Test
@@ -83,9 +83,9 @@ public class TrinoDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         TrinoConnectionParam trinoConnectionParam = new TrinoConnectionParam();
-        trinoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
+        trinoConnectionParam.setJdbcUrl("jdbc:trino://localhost:30001/default");
         trinoConnectionParam.setOther("other");
-        Assert.assertEquals("jdbc:postgresql://localhost:1234/default?other",
+        Assert.assertEquals("jdbc:trino://localhost:30001/default?other",
                 trinoDatasourceProcessor.getJdbcUrl(trinoConnectionParam));
 
     }

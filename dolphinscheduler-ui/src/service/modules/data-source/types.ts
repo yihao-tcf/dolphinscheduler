@@ -28,6 +28,7 @@ type IDataBase =
   | 'REDSHIFT'
   | 'ATHENA'
   | 'TRINO'
+  | 'KYUUBI'
 
 interface IDataSource {
   id?: number

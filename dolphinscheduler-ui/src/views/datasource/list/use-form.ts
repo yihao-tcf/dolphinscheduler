@@ -245,6 +245,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'TRINO',
     label: 'TRINO',
     defaultPort: 8080
+  },
+  KYUUBI: {
+    value: 'KYUUBI',
+    label: 'KYUUBI',
+    defaultPort: 10015
   }
 }
 

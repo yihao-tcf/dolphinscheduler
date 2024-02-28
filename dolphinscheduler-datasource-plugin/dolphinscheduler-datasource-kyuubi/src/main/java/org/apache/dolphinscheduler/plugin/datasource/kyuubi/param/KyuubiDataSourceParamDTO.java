@@ -15,22 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import com.google.auto.service.AutoService;
+public class KyuubiDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-@AutoService(DataSourceChannelFactory.class)
-public class TrinoDataSourceChannelFactory implements DataSourceChannelFactory {
     @Override
-    public String getName() {
-        return "trino";
+    public String toString() {
+        return "KyuubiDataSourceParamDTO{"
+                + "name='" + name + '\''
+                + ", note='" + note + '\''
+                + ", host='" + host + '\''
+                + ", port=" + port
+                + ", database='" + database + '\''
+                + ", userName='" + userName + '\''
+                + ", password='" + password + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
 
     @Override
-    public DataSourceChannel create() {
-        return new TrinoDataSourceChannel();
+    public DbType getType() {
+        return DbType.KYUUBI;
     }
 }

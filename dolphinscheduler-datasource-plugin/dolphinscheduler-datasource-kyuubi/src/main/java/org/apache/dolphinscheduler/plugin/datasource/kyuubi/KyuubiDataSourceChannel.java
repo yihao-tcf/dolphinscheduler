@@ -15,29 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino.param;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class TrinoDataSourceParamDTO extends BaseDataSourceParamDTO {
+import java.util.TimeZone;
+
+public class KyuubiDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public String toString() {
-        return "TrinoDataSourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", password='" + password + '\''
-                + ", other='" + other + '\''
-                + '}';
-    }
-
-    @Override
-    public DbType getType() {
-        return DbType.TRINO;
+    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new KyuubiDataSourceClient(baseConnectionParam, dbType);
     }
 }

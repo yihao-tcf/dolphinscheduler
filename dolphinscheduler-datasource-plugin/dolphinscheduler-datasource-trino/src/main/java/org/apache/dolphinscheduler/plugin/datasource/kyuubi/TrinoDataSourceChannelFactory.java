@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.trino;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
-import org.junit.Assert;
-import org.junit.Test;
+import com.google.auto.service.AutoService;
 
-public class TrinoDataSourceChannelFactoryTest {
+@AutoService(DataSourceChannelFactory.class)
+public class TrinoDataSourceChannelFactory implements DataSourceChannelFactory {
+    @Override
+    public String getName() {
+        return "trino";
+    }
 
-    @Test
-    public void testCreate() {
-        TrinoDataSourceChannelFactory sourceChannelFactory = new TrinoDataSourceChannelFactory();
-        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
-        Assert.assertNotNull(dataSourceChannel);
+    @Override
+    public DataSourceChannel create() {
+        return new TrinoDataSourceChannel();
     }
 }
