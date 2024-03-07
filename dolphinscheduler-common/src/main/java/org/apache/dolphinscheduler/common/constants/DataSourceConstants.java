@@ -69,8 +69,7 @@ public class DataSourceConstants {
     public static final String JDBC_REDSHIFT = "jdbc:redshift://";
     public static final String JDBC_ATHENA = "jdbc:awsathena://";
     public static final String JDBC_TRINO = "jdbc:trino://";
-
-    public static final String JDBC_KYUUBI = JDBC_HIVE_2;
+    public static final String JDBC_KYUUBI = "jdbc:kyuubi://";
 
     /**
      * database type

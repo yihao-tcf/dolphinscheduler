@@ -128,9 +128,21 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isNotEmpty(otherMap)) {
-            List<String> list = new ArrayList<>();
-            otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-            return String.join("&", list);
+            List<String> clientProperties = new ArrayList<>();
+            List<String> sessionProperties = new ArrayList<>();
+            otherMap.forEach((key, value) -> {
+                String keyLow = key.toLowerCase();
+                if (keyLow.contains(DbType.KYUUBI.getDescp()) ||
+                        keyLow.contains(DbType.SPARK.getDescp()) ||
+                        keyLow.contains("flink") ||
+                        keyLow.contains(DbType.HIVE.getDescp()) ||
+                        keyLow.contains(DbType.TRINO.getDescp())) {
+                    sessionProperties.add(String.format("%s=%s", key, value));
+                } else {
+                    clientProperties.add(String.format("%s=%s", key, value));
+                }
+            });
+            return String.join(";", clientProperties) + String.join("#", sessionProperties);
         }
         return null;
     }
