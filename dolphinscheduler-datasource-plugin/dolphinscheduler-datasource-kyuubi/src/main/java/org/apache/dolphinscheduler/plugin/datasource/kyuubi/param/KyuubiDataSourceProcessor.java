@@ -103,7 +103,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
         if (!StringUtils.isEmpty(kyuubiConnectionParam.getOther())) {
-            return String.format("%s?%s", kyuubiConnectionParam.getJdbcUrl(), kyuubiConnectionParam.getOther());
+            return String.format("%s;%s", kyuubiConnectionParam.getJdbcUrl(), kyuubiConnectionParam.getOther());
         }
         return kyuubiConnectionParam.getJdbcUrl();
     }
