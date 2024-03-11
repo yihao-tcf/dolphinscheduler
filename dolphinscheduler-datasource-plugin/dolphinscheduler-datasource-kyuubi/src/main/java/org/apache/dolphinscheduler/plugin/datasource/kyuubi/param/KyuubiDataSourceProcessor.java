@@ -142,7 +142,12 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
                     clientProperties.add(String.format("%s=%s", key, value));
                 }
             });
-            return String.join(";", clientProperties) + String.join("#", sessionProperties);
+            String clientStr = String.join(";", clientProperties);
+            String sessionStr = String.join("#", sessionProperties);
+            if (StringUtils.isNoneBlank(sessionStr)) {
+                clientStr += "#" + sessionStr;
+            }
+            return clientStr;
         }
         return null;
     }
@@ -152,9 +157,14 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
             return null;
         }
         Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
+        String[] configs = other.split("[;#]");
         for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
+            String[] keyValue = config.split("=");
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+                otherMap.put(key, value);
+            }
         }
         return otherMap;
     }
