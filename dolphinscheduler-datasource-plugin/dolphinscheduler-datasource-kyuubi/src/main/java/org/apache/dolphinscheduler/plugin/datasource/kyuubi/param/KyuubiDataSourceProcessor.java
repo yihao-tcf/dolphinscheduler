@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -34,6 +35,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +114,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
         String jdbcUrl = kyuubiConnectionParam.getJdbcUrl();
 
         if (MapUtils.isNotEmpty(kyuubiConnectionParam.getOther())) {
-            return jdbcUrl + "?" + transformOther(kyuubiConnectionParam.getOther());
+            return jdbcUrl + ";" + transformOther(kyuubiConnectionParam.getOther());
         }
         return jdbcUrl;
     }
@@ -137,12 +139,46 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
+        if (MapUtils.isNotEmpty(otherMap)) {
+            List<String> clientProperties = new ArrayList<>();
+            List<String> sessionProperties = new ArrayList<>();
+            otherMap.forEach((key, value) -> {
+                String keyLow = key.toLowerCase();
+                if (keyLow.contains(DbType.KYUUBI.getName()) ||
+                        keyLow.contains(DbType.SPARK.getName()) ||
+                        keyLow.contains("flink") ||
+                        keyLow.contains(DbType.HIVE.getName()) ||
+                        keyLow.contains(DbType.TRINO.getName())) {
+                    sessionProperties.add(String.format("%s=%s", key, value));
+                } else {
+                    clientProperties.add(String.format("%s=%s", key, value));
+                }
+            });
+            String clientStr = String.join(";", clientProperties);
+            String sessionStr = String.join(";", sessionProperties);
+            if (StringUtils.isNoneBlank(sessionStr)) {
+                clientStr += "#" + sessionStr;
+            }
+            return clientStr;
+        }
+        return null;
+    }
+
+    private Map<String, String> parseOther(String other) {
+        if (StringUtils.isEmpty(other)) {
             return null;
         }
-        List<String> otherList = new ArrayList<>();
-        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
-        return String.join(";", otherList);
+        Map<String, String> otherMap = new LinkedHashMap<>();
+        String[] configs = other.split("[;#]");
+        for (String config : configs) {
+            String[] keyValue = config.split("=");
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+                otherMap.put(key, value);
+            }
+        }
+        return otherMap;
     }
 
 }
