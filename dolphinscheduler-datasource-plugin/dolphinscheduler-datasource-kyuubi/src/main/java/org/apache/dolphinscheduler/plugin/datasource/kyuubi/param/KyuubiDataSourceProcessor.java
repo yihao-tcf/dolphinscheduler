@@ -143,7 +143,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
                 }
             });
             String clientStr = String.join(";", clientProperties);
-            String sessionStr = String.join("#", sessionProperties);
+            String sessionStr = String.join(";", sessionProperties);
             if (StringUtils.isNoneBlank(sessionStr)) {
                 clientStr += "#" + sessionStr;
             }
