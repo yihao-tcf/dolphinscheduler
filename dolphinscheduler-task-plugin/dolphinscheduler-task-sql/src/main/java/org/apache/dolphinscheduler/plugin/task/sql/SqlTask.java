@@ -53,9 +53,11 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -91,6 +93,8 @@ public class SqlTask extends AbstractTask {
     public static final int TEST_FLAG_YES = 1;
 
     private final DbType dbType;
+
+    private final Queue<Statement> statementQueue = new LinkedList<>();
 
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
@@ -169,7 +173,16 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+      log.info("sql task cancel");
+      while (!statementQueue.isEmpty()) {
+        Statement statement = statementQueue.poll();
+        try {
+          statement.cancel();
+          log.info("cancel statement success");
+        } catch (SQLException e) {
+          log.error("cancel statement error", e);
+        }
+      }
     }
 
     /**
@@ -391,6 +404,7 @@ public class SqlTask extends AbstractTask {
             }
             log.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),
                     sqlBinds.getParamsMap());
+            statementQueue.offer(stmt);
             return stmt;
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
