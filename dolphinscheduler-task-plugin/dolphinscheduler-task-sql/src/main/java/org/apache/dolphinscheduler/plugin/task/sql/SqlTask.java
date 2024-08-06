@@ -51,9 +51,11 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -94,6 +96,8 @@ public class SqlTask extends AbstractTask {
 
     private SQLTaskExecutionContext sqlTaskExecutionContext;
 
+    //stmt using cancel sql task
+    Queue<PreparedStatement> queueStatement = new LinkedList();
     /**
      * Abstract Yarn Task
      *
@@ -173,7 +177,23 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-
+      logger.info("sql task cancel........");
+      while (!queueStatement.isEmpty()) {
+        PreparedStatement statement = queueStatement.poll();
+        if (statement == null) {
+          logger.info("statement is null");
+          return;
+        }
+        try {
+          statement.cancel();
+          logger.info("cancel statement success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("execute sql error: {}", e.getMessage());
+        } finally {
+          close(statement);
+        }
+      }
     }
 
     /**
@@ -303,6 +323,7 @@ public class SqlTask extends AbstractTask {
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
+            queueStatement.offer(statement);
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
@@ -313,6 +334,7 @@ public class SqlTask extends AbstractTask {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
             try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
+                queueStatement.offer(statement);
                 result = statement.executeUpdate();
                 logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
                         sqlBind.getSql());
@@ -339,13 +361,56 @@ public class SqlTask extends AbstractTask {
 
     /**
      * close jdbc resource
-     *
      * @param connection connection
      */
     private void close(Connection connection) {
+        close(connection, null, null);
+    }
+
+    /**
+     * close jdbc resource
+     * @param statement Statement
+     */
+    private void close(Statement statement) {
+        close(null, statement, null);
+    }
+
+    /**
+     * close jdbc resource
+     * @param rs ResultSet
+     */
+    private void close(ResultSet rs) {
+        close(null, null, rs);
+    }
+
+    /**
+     * close jdbc resource
+     *
+     * @param connection connection
+     * @param stmt Statement
+     * @param rs ResultSet
+     */
+    private void close(Connection connection, Statement stmt, ResultSet rs) {
+        logger.info("close jdbc resource..........");
         if (connection != null) {
             try {
                 connection.close();
+            } catch (SQLException e) {
+                logger.error("close connection error : {}", e.getMessage(), e);
+            }
+        }
+
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                logger.error("close connection error : {}", e.getMessage(), e);
+            }
+        }
+
+        if (rs != null) {
+            try {
+                rs.close();
             } catch (SQLException e) {
                 logger.error("close connection error : {}", e.getMessage(), e);
             }

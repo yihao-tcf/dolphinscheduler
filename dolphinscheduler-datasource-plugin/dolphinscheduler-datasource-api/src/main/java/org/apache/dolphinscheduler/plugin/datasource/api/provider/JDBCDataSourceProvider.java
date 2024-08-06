@@ -27,7 +27,10 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +112,25 @@ public class JDBCDataSourceProvider {
         return dataSource;
     }
 
+    /**
+     *
+     * @param properties prop
+     * @param dbType dbt ype
+     * @return AdHoc jdbc data source
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
+    public static Connection createAdHocJdbcDataSource(BaseConnectionParam properties, DbType dbType) throws SQLException, ClassNotFoundException {
+        logger.info("Creating AdHoc JdbcDataSource");
+        //TODO Support multiple versions of data sources
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        loaderJdbcDriver(classLoader, properties, dbType);
+        Class.forName(properties.getDriverClassName());
+        return DriverManager.getConnection(
+                DataSourceUtils.getJdbcUrl(dbType, properties),
+                properties.getUser(),
+                PasswordUtils.decodePassword(properties.getPassword()));
+    }
     protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, DbType dbType) {
         String drv = StringUtils.isBlank(properties.getDriverClassName()) ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver() : properties.getDriverClassName();
         try {
