@@ -114,12 +114,15 @@ public class DependentExecute {
             if (processInstance == null) {
                 result = DependResult.WAITING;
             } else {
-            // need to check workflow for updates, so get all task and check the task state
-              if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                result = dependResultByProcessInstance(processInstance);
-              } else {
-                result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance);
-              }
+                // need to check workflow for updates, so get all task and check the task state
+                if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                    result = dependResultByProcessInstance(processInstance);
+                } else {
+                    result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance);
+                }
+                if (result != DependResult.SUCCESS) {
+                    break;
+                }
             }
         }
         return result;
