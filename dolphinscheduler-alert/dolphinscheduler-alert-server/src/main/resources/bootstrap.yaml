@@ -24,5 +24,6 @@ spring:
         enabled: true
         mode: event
       config:
+        enabled: false
         sources:
           - name: ${spring.application.name}
