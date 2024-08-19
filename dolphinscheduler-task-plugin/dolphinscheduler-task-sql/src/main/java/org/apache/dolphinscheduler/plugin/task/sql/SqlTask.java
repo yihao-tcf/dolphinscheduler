@@ -94,7 +94,7 @@ public class SqlTask extends AbstractTask {
 
     private final DbType dbType;
 
-    private final Queue<Statement> statementQueue = new LinkedList<>();
+    private final Queue<Statement> sqlTaskConnectQueue = new LinkedList<>();
 
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
@@ -173,14 +173,23 @@ public class SqlTask extends AbstractTask {
 
     @Override
     public void cancel() throws TaskException {
-      log.info("sql task cancel");
-      while (!statementQueue.isEmpty()) {
-        Statement statement = statementQueue.poll();
+      log.info("sql task cancel, sql title:{} taskName:{} taskInstanceId:{}",
+              sqlParameters.getTitle(),
+              taskExecutionContext.getTaskName(),
+              taskExecutionContext.getTaskInstanceId());
+      if (sqlTaskConnectQueue.isEmpty()) {
+        log.warn("sql task queue statement is empty cancel failed");
+      }
+      while (!sqlTaskConnectQueue.isEmpty()) {
+        Statement statement = null;
         try {
+          statement = sqlTaskConnectQueue.poll();
           statement.cancel();
           log.info("cancel statement success");
-        } catch (SQLException e) {
+        } catch (Exception e) {
           log.error("cancel statement error", e);
+        } finally {
+          close(null, statement, null);
         }
       }
     }
@@ -327,7 +336,10 @@ public class SqlTask extends AbstractTask {
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
         try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
             log.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = null;
+            if (!statement.isClosed()) {
+              resultSet = statement.executeQuery();
+            }
             return resultProcess(resultSet);
         }
     }
@@ -337,9 +349,11 @@ public class SqlTask extends AbstractTask {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
             try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
-                result = statement.executeUpdate();
-                log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
-                        sqlBind.getSql());
+                if (!statement.isClosed()) {
+                  result = statement.executeUpdate();
+                  log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
+                            sqlBind.getSql());
+                }
             }
         }
         return String.valueOf(result);
@@ -366,10 +380,29 @@ public class SqlTask extends AbstractTask {
      *
      * @param connection connection
      */
-    private void close(Connection connection) {
+    private void close(Connection connection, Statement statement, ResultSet resultSet) {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+                log.info("close resultSet success");
+            } catch (SQLException e) {
+                log.error("close resultSet error : {}", e.getMessage(), e);
+            }
+        }
+
+        if (statement != null) {
+            try {
+                statement.close();
+                log.info("close statement success");
+            } catch (SQLException e) {
+                log.error("close statement error : {}", e.getMessage(), e);
+            }
+        }
+
         if (connection != null) {
             try {
                 connection.close();
+                log.info("close connection success");
             } catch (SQLException e) {
                 log.error("close connection error : {}", e.getMessage(), e);
             }
@@ -404,7 +437,7 @@ public class SqlTask extends AbstractTask {
             }
             log.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),
                     sqlBinds.getParamsMap());
-            statementQueue.offer(stmt);
+            sqlTaskConnectQueue.offer(stmt);
             return stmt;
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
