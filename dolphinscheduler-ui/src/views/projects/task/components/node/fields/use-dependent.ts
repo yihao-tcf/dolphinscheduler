@@ -119,6 +119,22 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
       {
         value: 'last24Hours',
         label: t('project.node.last_24_hour')
+      },
+      {
+        value: 'in1Hours',
+        label: t('project.node.in_1_hour')
+      },
+      {
+        value: 'in2Hours',
+        label: t('project.node.in_2_hour')
+      },
+      {
+        value: 'in3Hours',
+        label: t('project.node.in_3_hour')
+      },
+      {
+        value: 'in24Hours',
+        label: t('project.node.in_24_hour')
       }
     ],
     day: [
@@ -141,6 +157,22 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
       {
         value: 'last7Days',
         label: t('project.node.last_7_days')
+      },
+      {
+        value: 'in1Days',
+        label: t('project.node.in_1_days')
+      },
+      {
+        value: 'in2Days',
+        label: t('project.node.in_2_days')
+      },
+      {
+        value: 'in3Days',
+        label: t('project.node.in_3_days')
+      },
+      {
+        value: 'in7Days',
+        label: t('project.node.in_7_days')
       }
     ],
     week: [
@@ -475,6 +507,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                   return Error(t('project.node.date_tips'))
                 }
               }
+            },
+            props: {
+                filterable: true,
+                tag: true
             }
           }),
           (j = 0) => ({

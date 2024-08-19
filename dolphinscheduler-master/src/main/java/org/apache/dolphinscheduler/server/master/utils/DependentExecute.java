@@ -153,18 +153,23 @@ public class DependentExecute {
                     findLastProcessInterval(dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(),
                             dateInterval, testFlag);
             if (processInstance == null) {
-                return DependResult.WAITING;
-            }
-            // need to check workflow for updates, so get all task and check the task state
-            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
-                result = dependResultByProcessInstance(processInstance);
-            } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                result = dependResultByAllTaskOfProcessInstance(processInstance, testFlag);
+                result = DependResult.WAITING;
             } else {
-                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), testFlag);
-            }
-            if (result != DependResult.SUCCESS) {
-                break;
+                // need to check workflow for updates, so get all task and check the task state
+                if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
+                    result = dependResultByProcessInstance(processInstance);
+                } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                    result = dependResultByAllTaskOfProcessInstance(processInstance, testFlag);
+                } else {
+                    result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), testFlag);
+                }
+                if (result != DependResult.SUCCESS) {
+                    break;
+                }
+                // Processing “within a specified time interval” is successful if completed once.
+                if (dependentItem.getDateValue().startsWith("in".toLowerCase())) {
+                  return result;
+                }
             }
         }
         return result;
@@ -395,7 +400,7 @@ public class DependentExecute {
                         dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode());
                 continue;
             }
-            DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
+            DependResult dependResult =   getDependResultForItem(dependentItem, currentTime, testFlag);
             if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
                 if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
