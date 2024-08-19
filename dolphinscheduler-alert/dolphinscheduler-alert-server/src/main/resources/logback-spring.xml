@@ -22,7 +22,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - %msg%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z,GMT+8} %logger{96}:[%line] - %msg%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -31,7 +31,7 @@
     <appender name="ALERTLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-alert.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.base}/dolphinscheduler-alert.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.base}/dolphinscheduler-alert.%d{yyyy-MM-dd_HH,GMT+8}.%i.log</fileNamePattern>
             <maxHistory>20</maxHistory>
             <maxFileSize>64MB</maxFileSize>
             <totalSizeCap>50GB</totalSizeCap>
@@ -39,7 +39,7 @@
         </rollingPolicy>
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - %msg%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z,GMT+8} %logger{96}:[%line] - %msg%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>

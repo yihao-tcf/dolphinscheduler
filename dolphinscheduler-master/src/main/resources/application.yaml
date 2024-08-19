@@ -20,7 +20,7 @@ spring:
   banner:
     charset: UTF-8
   jackson:
-    time-zone: UTC
+    time-zone: GMT+8
     date-format: "yyyy-MM-dd HH:mm:ss"
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -116,7 +116,7 @@ master:
   kill-application-when-task-failover: true
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
-    strategy: waiting
+    strategy: stop
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   worker-group-refresh-interval: 10s
@@ -153,7 +153,6 @@ metrics:
   enabled: true
 
 # Override by profile
-
 ---
 spring:
   config:

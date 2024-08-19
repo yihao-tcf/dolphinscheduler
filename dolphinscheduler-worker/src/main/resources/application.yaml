@@ -18,7 +18,7 @@ spring:
   banner:
     charset: UTF-8
   jackson:
-    time-zone: UTC
+    time-zone: GMT+8
     date-format: "yyyy-MM-dd HH:mm:ss"
   autoconfigure:
     exclude:
@@ -34,7 +34,7 @@ registry:
       base-sleep-time: 60ms
       max-sleep: 300ms
       max-retries: 5
-    session-timeout: 30s
+    session-timeout: 120s
     connection-timeout: 9s
     block-until-connected: 600ms
     digest: ~
